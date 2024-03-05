@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Camera Example</title>
+<style>
+    video {
+        width: 100%;
+        height: auto;
+    }
+</style>
+</head>
+<body>
+<h1>Web Camera Example</h1>
+<div>
+    <button id="startButton">Start Camera</button>
+    <button id="takeButton">Take Picture</button>
+</div>
+<div>
+    <video id="videoElement" autoplay></video>
+    <canvas id="canvasElement"></canvas>
+</div>
+<script>
+    const startButton = document.getElementById('startButton');
+    const takeButton = document.getElementById('takeButton');
+    const videoElement = document.getElementById('videoElement');
+    const canvasElement = document.getElementById('canvasElement');
+    const constraints = {
+        video: true
+    };
+
+    // Start camera function
+    async function startCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            videoElement.srcObject = stream;
+        } catch (err) {
+            console.error('Error accessing the camera: ', err);
+        }
+    }
+
+    // Take picture function
+    function takePicture() {
+        const context = canvasElement.getContext('2d');
+        canvasElement.width = videoElement.videoWidth;
+        canvasElement.height = videoElement.videoHeight;
+        context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+        const imageDataURL = canvasElement.toDataURL('image/png');
+        displayPicture(imageDataURL);
+    }
+
+    // Display the taken picture
+    function displayPicture(imageDataURL) {
+        const image = new Image();
+        image.src = imageDataURL;
+        document.body.appendChild(image);
+    }
+
+    // Event listeners
+    startButton.addEventListener('click', startCamera);
+    takeButton.addEventListener('click', takePicture);
+
+    // Timer to automatically take a picture after 5 seconds (5000 milliseconds)
+    setTimeout(takePicture, 5000); // Adjust the duration as needed
+</script>
+</body>
+</html>
